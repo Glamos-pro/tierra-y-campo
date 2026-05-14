@@ -245,6 +245,14 @@ export default function Home() {
           .sel-badge { display: inline-block; margin-top: 12px; font-size: 11px; font-weight: 500; color: #1D9E75; background: #E1F5EE; padding: 3px 10px; border-radius: 100px; }
           .wa-float { position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 150; text-decoration: none; font-size: 32px; transition: transform 0.2s; }
           .wa-float:hover { transform: scale(1.1); }
+        .tyc-nosotros { background: white; border-top: 1px solid rgba(0,0,0,0.06); padding: 60px 40px; }
+        .tyc-nosotros-inner { max-width: 1100px; margin: 0 auto; }
+        .tyc-nosotros-title { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 300; color: #085041; text-align: center; margin-bottom: 40px; }
+        .tyc-nosotros-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+        .tyc-nosotros-card { background: #F7F6F2; border-radius: 16px; padding: 28px; }
+        .tyc-nosotros-card-icon { font-size: 32px; margin-bottom: 12px; }
+        .tyc-nosotros-card-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 300; color: #085041; margin-bottom: 12px; }
+        .tyc-nosotros-card-text { font-size: 14px; color: #666; line-height: 1.7; }
           @media (max-width: 600px) { .sel-title { font-size: 26px; } .sel-grid { grid-template-columns: 1fr 1fr; } }
         `}</style>
         <div className="sel-root">
@@ -263,7 +271,9 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <a className="wa-float" href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer">💬</a>
+        <a className="wa-float" href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" width="35" height="35" />
+</a>
       </>
     );
   }
@@ -380,6 +390,14 @@ export default function Home() {
         .tyc-footer strong { color: white; font-size: 15px; }
         .wa-float { position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 150; text-decoration: none; font-size: 32px; transition: transform 0.2s; }
         .wa-float:hover { transform: scale(1.1); }
+        .tyc-nosotros { background: white; border-top: 1px solid rgba(0,0,0,0.06); padding: 60px 40px; }
+        .tyc-nosotros-inner { max-width: 1100px; margin: 0 auto; }
+        .tyc-nosotros-title { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 300; color: #085041; text-align: center; margin-bottom: 40px; }
+        .tyc-nosotros-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+        .tyc-nosotros-card { background: #F7F6F2; border-radius: 16px; padding: 28px; }
+        .tyc-nosotros-card-icon { font-size: 32px; margin-bottom: 12px; }
+        .tyc-nosotros-card-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 300; color: #085041; margin-bottom: 12px; }
+        .tyc-nosotros-card-text { font-size: 14px; color: #666; line-height: 1.7; }
         @media (max-width: 700px) {
           .tyc-nav { padding: 0 16px; }
           .tyc-hero { grid-template-columns: 1fr; padding: 36px 20px; gap: 28px; }
@@ -423,6 +441,29 @@ export default function Home() {
             <div><div className="tyc-stat-num">24h</div><div className="tyc-stat-label">Entrega día siguiente</div></div>
             <div><div className="tyc-stat-num">100%</div><div className="tyc-stat-label">Productos frescos garantizados</div></div>
             <div><div className="tyc-stat-num">0</div><div className="tyc-stat-label">Intermediarios. Precio directo.</div></div>
+          </div>
+        </div>
+
+        <div className="tyc-nosotros">
+          <div className="tyc-nosotros-inner">
+            <h2 className="tyc-nosotros-title">Quiénes somos</h2>
+            <div className="tyc-nosotros-grid">
+              <div className="tyc-nosotros-card">
+                <div className="tyc-nosotros-card-icon">🌾</div>
+                <div className="tyc-nosotros-card-title">Nuestra historia</div>
+                <div className="tyc-nosotros-card-text">Tierra y Campo nació en Tuxtla Gutiérrez, Chiapas, con una misión clara: optimizar el tiempo de las personas y negocios al momento de realizar sus compras de productos agrícolas. Creamos una plataforma donde puedes encontrar productos frescos, de calidad y a precios competitivos, todo desde tu celular o computadora, sin filas, sin tráfico, sin esperas.</div>
+              </div>
+              <div className="tyc-nosotros-card">
+                <div className="tyc-nosotros-card-icon">🎯</div>
+                <div className="tyc-nosotros-card-title">Nuestra misión</div>
+                <div className="tyc-nosotros-card-text">Facilitar a las personas y negocios la compra de productos frescos y de calidad, optimizando sus tiempos, garantizando precios competitivos y fortaleciendo la economía local de los productores del campo.</div>
+              </div>
+              <div className="tyc-nosotros-card">
+                <div className="tyc-nosotros-card-icon">🔭</div>
+                <div className="tyc-nosotros-card-title">Nuestra visión</div>
+                <div className="tyc-nosotros-card-text">Ser la plataforma líder de productos agrícolas en México, presente en las ciudades principales del país, ayudando a millones de personas y negocios a realizar sus compras de manera más eficiente, rápida y confiable.</div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -532,7 +573,9 @@ export default function Home() {
         )}
 
         {/* Botón flotante WhatsApp */}
-        <a className="wa-float" href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer">💬</a>
+        <a className="wa-float" href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" width="35" height="35" />
+</a>
       </div>
     </>
   );
