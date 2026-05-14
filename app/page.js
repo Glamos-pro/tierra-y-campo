@@ -6,11 +6,9 @@ import ContactForm from './ContactForm';
 import { PRODUCTOS, DESCUENTOS, PERFILES } from './productos';
 
 const CATEGORIAS = ['Todos', 'Frutas', 'Chiles', 'Verduras'];
-
-// Perfiles que usan popup de restaurante (kilos mínimo 2kg + bulto/reja)
 const PERFILES_NEGOCIO = ['restaurante', 'bar', 'verduleria', 'negocio'];
+const WHATSAPP_NUMBER = '529611176006';
 
-// ─── POPUP HOGAR ───────────────────────────────────────────────────────
 function PopupHogar({ product, descuento, onAdd, onClose }) {
   const [opcion, setOpcion] = useState('kg');
   const [kilos, setKilos]   = useState(0.5);
@@ -52,7 +50,6 @@ function PopupHogar({ product, descuento, onAdd, onClose }) {
         <div className="popup-cat">{product.categoria}</div>
         <div className="popup-name">{product.name}</div>
         <div className="popup-desc">{product.description}</div>
-
         <div className="popup-section-label">Elige una opción</div>
         <div className={`popup-opciones ${!precioPieza ? 'solo-kg' : ''}`}>
           <button className={`popup-opcion-btn ${opcion === 'kg' ? 'active' : ''}`} onClick={() => setOpcion('kg')}>
@@ -68,26 +65,20 @@ function PopupHogar({ product, descuento, onAdd, onClose }) {
             </button>
           )}
         </div>
-
         {opcion === 'kg' && (
           <div className="popup-kg-section">
             <div className="popup-section-label">¿Cuántos kilos?</div>
             <div className="popup-cantidad-row">
               <button className="popup-qty-btn" onClick={() => cambiarKilos(-0.5)}>−</button>
-              <input
-                className="popup-kg-input"
-                type="number" min="0.5" step="0.5"
-                value={kilos}
+              <input className="popup-kg-input" type="number" min="0.5" step="0.5" value={kilos}
                 onChange={(e) => { const v = parseFloat(e.target.value); if (!isNaN(v) && v > 0) setKilos(v); }}
-                onBlur={() => { if (!kilos || kilos < 0.5) setKilos(0.5); }}
-              />
+                onBlur={() => { if (!kilos || kilos < 0.5) setKilos(0.5); }} />
               <span className="popup-kg-unit">kg</span>
               <button className="popup-qty-btn" onClick={() => cambiarKilos(0.5)}>+</button>
             </div>
             <div className="popup-kg-hint">Sube de 0.5 en 0.5 kg o escribe la cantidad</div>
           </div>
         )}
-
         {opcion === 'pieza' && precioPieza && (
           <div className="popup-pieza-section">
             <div className="popup-section-label">¿Cuántas piezas?</div>
@@ -98,7 +89,6 @@ function PopupHogar({ product, descuento, onAdd, onClose }) {
             </div>
           </div>
         )}
-
         <div className="popup-footer">
           <div className="popup-total">
             <span className="popup-total-label">Total</span>
@@ -111,11 +101,10 @@ function PopupHogar({ product, descuento, onAdd, onClose }) {
   );
 }
 
-// ─── POPUP RESTAURANTE ─────────────────────────────────────────────────
 function PopupRestaurante({ product, descuento, onAdd, onClose }) {
-  const [opcion, setOpcion]   = useState('kg');
-  const [kilos, setKilos]     = useState(2);
-  const [bultos, setBultos]   = useState(1);
+  const [opcion, setOpcion] = useState('kg');
+  const [kilos, setKilos]   = useState(2);
+  const [bultos, setBultos] = useState(1);
 
   const precioKg    = Math.round(product.price_kg * descuento);
   const precioBulto = product.price_bulto ? Math.round(product.price_bulto * descuento) : null;
@@ -138,9 +127,7 @@ function PopupRestaurante({ product, descuento, onAdd, onClose }) {
     onAdd({
       id: `${product.id}-${opcion}-${Date.now()}`,
       name: product.name,
-      detalle: opcion === 'kg'
-        ? `${kilos} kg`
-        : `${bultos} ${nombreBulto} (${bultos * kgBulto} kg aprox.)`,
+      detalle: opcion === 'kg' ? `${kilos} kg` : `${bultos} ${nombreBulto} (${bultos * kgBulto} kg aprox.)`,
       emoji: product.emoji,
       price: getTotal(),
       unit: opcion,
@@ -157,12 +144,9 @@ function PopupRestaurante({ product, descuento, onAdd, onClose }) {
         <div className="popup-cat">{product.categoria}</div>
         <div className="popup-name">{product.name}</div>
         <div className="popup-desc">{product.description}</div>
-
-        {/* Badge de precio especial */}
         <div className="popup-negocio-badge">
           🎉 Precio especial para negocios — {Math.round((1 - descuento) * 100)}% de descuento
         </div>
-
         <div className="popup-section-label">Elige una opción</div>
         <div className={`popup-opciones ${!precioBulto ? 'solo-kg' : ''}`}>
           <button className={`popup-opcion-btn ${opcion === 'kg' ? 'active' : ''}`} onClick={() => setOpcion('kg')}>
@@ -180,44 +164,33 @@ function PopupRestaurante({ product, descuento, onAdd, onClose }) {
             </button>
           )}
         </div>
-
-        {/* Kilos — mínimo 2kg */}
         {opcion === 'kg' && (
           <div className="popup-kg-section">
             <div className="popup-section-label">¿Cuántos kilos? (mínimo 2 kg)</div>
             <div className="popup-cantidad-row">
               <button className="popup-qty-btn" onClick={() => cambiarKilos(-0.5)}>−</button>
-              <input
-                className="popup-kg-input"
-                type="number" min="2" step="0.5"
-                value={kilos}
+              <input className="popup-kg-input" type="number" min="2" step="0.5" value={kilos}
                 onChange={(e) => { const v = parseFloat(e.target.value); if (!isNaN(v) && v >= 2) setKilos(v); }}
-                onBlur={() => { if (!kilos || kilos < 2) setKilos(2); }}
-              />
+                onBlur={() => { if (!kilos || kilos < 2) setKilos(2); }} />
               <span className="popup-kg-unit">kg</span>
               <button className="popup-qty-btn" onClick={() => cambiarKilos(0.5)}>+</button>
             </div>
             <div className="popup-kg-hint">Sube de 0.5 en 0.5 kg o escribe la cantidad</div>
           </div>
         )}
-
-        {/* Bultos/Rejas — de 1 en 1 */}
         {opcion === 'bulto' && precioBulto && (
           <div className="popup-pieza-section">
             <div className="popup-section-label">¿Cuántos necesitas?</div>
             <div className="popup-cantidad-row">
               <button className="popup-qty-btn" onClick={() => setBultos(Math.max(1, bultos - 1))}>−</button>
               <span className="popup-qty-num">
-                <>{bultos} {nombreBulto}</>
-                <span style={{display:'block', fontSize:'12px', color:'#888', fontWeight:'400'}}>
-                  ≈ {bultos * kgBulto} kg
-                </span>
+                {bultos} {nombreBulto}
+                <span style={{display:'block', fontSize:'12px', color:'#888', fontWeight:'400'}}>≈ {bultos * kgBulto} kg</span>
               </span>
               <button className="popup-qty-btn" onClick={() => setBultos(bultos + 1)}>+</button>
             </div>
           </div>
         )}
-
         <div className="popup-footer">
           <div className="popup-total">
             <span className="popup-total-label">Total</span>
@@ -243,7 +216,6 @@ export default function Home() {
 
   const descuento = perfil ? DESCUENTOS[perfil.id] : 1;
   const esNegocio = perfil && PERFILES_NEGOCIO.includes(perfil.id);
-
   const productos = PRODUCTOS.filter(p => p.activo);
   const productosFiltrados = categoriaActiva === 'Todos'
     ? productos
@@ -251,7 +223,6 @@ export default function Home() {
 
   const handleAdd = (item) => addToCart({ ...item, quantity: 1 });
 
-  // ─── SELECTOR DE PERFIL ──────────────────────────────────────────────
   if (!perfil) {
     return (
       <>
@@ -272,6 +243,8 @@ export default function Home() {
           .sel-card-label { font-weight: 600; font-size: 16px; color: #085041; margin-bottom: 8px; }
           .sel-card-desc { font-size: 12px; color: #999; line-height: 1.5; }
           .sel-badge { display: inline-block; margin-top: 12px; font-size: 11px; font-weight: 500; color: #1D9E75; background: #E1F5EE; padding: 3px 10px; border-radius: 100px; }
+          .wa-float { position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 150; text-decoration: none; font-size: 32px; transition: transform 0.2s; }
+          .wa-float:hover { transform: scale(1.1); }
           @media (max-width: 600px) { .sel-title { font-size: 26px; } .sel-grid { grid-template-columns: 1fr 1fr; } }
         `}</style>
         <div className="sel-root">
@@ -290,11 +263,11 @@ export default function Home() {
             ))}
           </div>
         </div>
+        <a className="wa-float" href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer">💬</a>
       </>
     );
   }
 
-  // ─── TIENDA PRINCIPAL ────────────────────────────────────────────────
   return (
     <>
       <style>{`
@@ -343,8 +316,6 @@ export default function Home() {
         .tyc-card-precio-item strong { color: #085041; }
         .tyc-card-ver { margin-top: 12px; width: 100%; background: #085041; color: white; border: none; padding: 10px; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.2s; }
         .tyc-card-ver:hover { background: #1D9E75; }
-
-        /* POPUP */
         .popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .popup-box { background: white; border-radius: 24px; width: 100%; max-width: 420px; padding: 32px; position: relative; max-height: 90vh; overflow-y: auto; }
         .popup-close { position: absolute; top: 16px; right: 16px; background: #f0f0f0; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #555; }
@@ -381,8 +352,6 @@ export default function Home() {
         .popup-total-precio { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 300; color: #085041; line-height: 1; }
         .popup-add-btn { background: #085041; color: white; border: none; padding: 14px 20px; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
         .popup-add-btn:hover { background: #1D9E75; }
-
-        /* CARRITO */
         .tyc-cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 200; display: flex; justify-content: flex-end; }
         .tyc-cart-panel { background: white; width: 400px; height: 100%; overflow-y: auto; display: flex; flex-direction: column; padding: 32px; }
         .tyc-cart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
@@ -409,6 +378,8 @@ export default function Home() {
         .tyc-envio-desc { font-size: 12px; color: #888; line-height: 1.5; }
         .tyc-footer { background: #085041; color: rgba(255,255,255,0.7); text-align: center; padding: 28px 40px; font-size: 13px; line-height: 1.8; }
         .tyc-footer strong { color: white; font-size: 15px; }
+        .wa-float { position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 150; text-decoration: none; font-size: 32px; transition: transform 0.2s; }
+        .wa-float:hover { transform: scale(1.1); }
         @media (max-width: 700px) {
           .tyc-nav { padding: 0 16px; }
           .tyc-hero { grid-template-columns: 1fr; padding: 36px 20px; gap: 28px; }
@@ -499,7 +470,7 @@ export default function Home() {
           <div className="tyc-envio-inner">
             <div className="tyc-envio-item"><div className="tyc-envio-icon">🚚</div><div><div className="tyc-envio-label">Entrega día siguiente</div><div className="tyc-envio-desc">Pide antes de las 9pm</div></div></div>
             <div className="tyc-envio-item"><div className="tyc-envio-icon">🌱</div><div><div className="tyc-envio-label">Frescura garantizada</div><div className="tyc-envio-desc">Seleccionados el día de tu entrega</div></div></div>
-            <div className="tyc-envio-item"><div className="tyc-envio-icon">💳</div><div><div className="tyc-envio-label">Pagos flexibles</div><div className="tyc-envio-desc">Efectivo, transferencia o MercadoPago</div></div></div>
+            <div className="tyc-envio-item"><div className="tyc-envio-icon">💳</div><div><div className="tyc-envio-label">Pagos flexibles</div><div className="tyc-envio-desc">Efectivo o transferencia</div></div></div>
             <div className="tyc-envio-item"><div className="tyc-envio-icon">🏪</div><div><div className="tyc-envio-label">Para negocios</div><div className="tyc-envio-desc">Precios especiales por volumen</div></div></div>
           </div>
         </div>
@@ -510,7 +481,6 @@ export default function Home() {
           © 2026 · Hecho con ❤️ en Chiapas, México
         </footer>
 
-        {/* Popup según perfil */}
         {productoSeleccionado && !esNegocio && (
           <PopupHogar product={productoSeleccionado} descuento={descuento} onAdd={handleAdd} onClose={() => setProducto(null)} />
         )}
@@ -560,6 +530,9 @@ export default function Home() {
         {showForm && (
           <ContactForm cart={cart} totalPrice={getTotalPrice()} onClose={() => setShowForm(false)} />
         )}
+
+        {/* Botón flotante WhatsApp */}
+        <a className="wa-float" href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer">💬</a>
       </div>
     </>
   );

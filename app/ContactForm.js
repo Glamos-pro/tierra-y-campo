@@ -3,7 +3,6 @@
 import { useState } from 'react';
 
 const WHATSAPP_NUMBER = '529611176006';
-const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeucVNXfgJPLUxMoDhg1Rr0qoHJmbuDO6vd2KVtp2m1YF80tw/viewform';
 const DATOS_TRANSFERENCIA = {
   banco: 'BANAMEX',
   titular: 'Tierra y Campo',
@@ -19,6 +18,7 @@ const getFechaManana = () => {
 
 export default function ContactForm({ cart, totalPrice, onClose }) {
   const [form, setForm] = useState({
+    cumpleanos: '',
     nombre: '',
     telefono: '',
     email: '',
@@ -59,7 +59,7 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
     const textoTransferencia = form.formaPago === 'Transferencia'
       ? `\n💳 *Datos para transferencia:*\nBanco: ${DATOS_TRANSFERENCIA.banco}\nTitular: ${DATOS_TRANSFERENCIA.titular}\nCuenta: ${DATOS_TRANSFERENCIA.cuenta}\nCLABE: ${DATOS_TRANSFERENCIA.clabe}\n\n📸 *Envía tu comprobante por WhatsApp con tu nombre completo.*`
       : '';
-    const texto = `🌾 *NUEVO PEDIDO — Tierra & Campo*\n─────────────────────\n👤 *Cliente:* ${form.nombre}\n📱 *Teléfono:* ${form.telefono}${form.email ? `\n📧 *Email:* ${form.email}` : ''}\n📍 *Dirección:* ${form.direccion}\n🏙️ *Ciudad:* ${form.ciudad} | *C.P.:* ${form.cp}${form.referencias ? `\n🗺️ *Referencias:* ${form.referencias}` : ''}\n📅 *Entrega:* ${fechaEntrega}\n💳 *Pago:* ${form.formaPago}\n─────────────────────\n🛒 *Productos:*\n${resumenProductos}\n─────────────────────\n💰 *TOTAL: $${totalPrice.toFixed(2)}*${textoTransferencia}`;
+    const texto = `🌾 *NUEVO PEDIDO — Tierra & Campo*\n─────────────────────\n👤 *Cliente:* ${form.nombre}\n📱 *Teléfono:* ${form.telefono}${form.email ? `\n📧 *Email:* ${form.email}` : ''}${form.cumpleanos ? `\n🎂 *Cumpleaños:* ${form.cumpleanos}` : ''}\n📍 *Dirección:* ${form.direccion}\n🏙️ *Ciudad:* ${form.ciudad} | *C.P.:* ${form.cp}${form.referencias ? `\n🗺️ *Referencias:* ${form.referencias}` : ''}\n📅 *Entrega:* ${fechaEntrega}\n💳 *Pago:* ${form.formaPago}\n─────────────────────\n🛒 *Productos:*\n${resumenProductos}\n─────────────────────\n💰 *TOTAL: $${totalPrice.toFixed(2)}*${textoTransferencia}`;
     return encodeURIComponent(texto);
   };
 
@@ -71,6 +71,7 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
     setTimeout(() => { setLoading(false); setEnviado(true); }, 800);
   };
 
+  // ─── PANTALLA DE ÉXITO ──────────────────────────────────────────────
   if (enviado) {
     return (
       <>
@@ -94,6 +95,11 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
             <div className="cf-success-title">¡Pedido enviado!</div>
             <div className="cf-success-desc">
               Tu pedido fue enviado. Nos pondremos en contacto contigo para confirmar tu entrega del día siguiente.
+              {form.cumpleanos && (
+                <div style={{marginTop:'12px', background:'#FFF0F5', borderRadius:'10px', padding:'12px', fontSize:'13px', color:'#C2185B'}}>
+                  🎂 ¡Gracias por compartir tu fecha de cumpleaños! Te sorprenderemos ese día especial.
+                </div>
+              )}
               {form.formaPago === 'Transferencia' && (
                 <div className="cf-transferencia-box">
                   <span className="cf-transferencia-title">🏦 Datos para transferencia:</span>
@@ -104,7 +110,7 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
                     CLABE: <strong>{DATOS_TRANSFERENCIA.clabe}</strong>
                   </div>
                   <div className="cf-comprobante-nota">
-                    📸 Envía tu comprobante por WhatsApp al {WHATSAPP_NUMBER.replace('52', '')} con tu nombre completo para confirmar tu pedido.
+                    📸 Envía tu comprobante por WhatsApp al {WHATSAPP_NUMBER.replace('52', '')} con tu nombre completo.
                   </div>
                 </div>
               )}
@@ -116,6 +122,7 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
     );
   }
 
+  // ─── FORMULARIO ─────────────────────────────────────────────────────
   return (
     <>
       <style>{`
@@ -127,6 +134,14 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
         .cf-close{background:#f0f0f0;border:none;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#555;}
         .cf-close:hover{background:#ddd;}
         .cf-body{padding:0 28px 28px;}
+        .cf-cumple-box{background:linear-gradient(135deg,#FFF0F5,#FFE4F0);border:1.5px solid #F48FB1;border-radius:16px;padding:20px;margin-bottom:20px;text-align:center;}
+        .cf-cumple-icon{font-size:36px;margin-bottom:8px;}
+        .cf-cumple-title{font-family:'Fraunces',serif;font-size:18px;font-weight:300;color:#C2185B;margin-bottom:4px;}
+        .cf-cumple-desc{font-size:12px;color:#888;margin-bottom:14px;line-height:1.5;}
+        .cf-cumple-input{width:100%;border:1.5px solid #F48FB1;border-radius:12px;padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:15px;color:#1C1C1A;outline:none;box-sizing:border-box;background:white;}
+        .cf-cumple-input:focus{border-color:#C2185B;}
+        .cf-cumple-skip{font-size:12px;color:#aaa;margin-top:8px;cursor:pointer;text-decoration:underline;background:none;border:none;font-family:'DM Sans',sans-serif;}
+        .cf-divider{border:none;border-top:1px solid #f0f0f0;margin:4px 0 20px;}
         .cf-section{margin-bottom:18px;}
         .cf-label{font-size:12px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;display:block;}
         .cf-input{width:100%;border:1.5px solid rgba(0,0,0,0.12);border-radius:12px;padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:15px;color:#1C1C1A;outline:none;transition:border-color 0.2s;box-sizing:border-box;}
@@ -172,26 +187,52 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
             <div className="cf-title">Finalizar pedido</div>
             <button className="cf-close" onClick={onClose}>✕</button>
           </div>
+
           <div className="cf-body">
+
+            {/* Fecha de cumpleaños */}
+            <div className="cf-cumple-box">
+              <div className="cf-cumple-icon">🎂</div>
+              <div className="cf-cumple-title">¿Cuándo es tu cumpleaños?</div>
+              <div className="cf-cumple-desc">Opcional — Te sorprenderemos ese día con un regalo especial 🎁</div>
+              <input
+                className="cf-cumple-input"
+                type="date"
+                value={form.cumpleanos}
+                onChange={(e) => handleChange('cumpleanos', e.target.value)}
+              />
+            </div>
+
+            <hr className="cf-divider" />
+
+            {/* Nombre */}
             <div className="cf-section">
               <label className="cf-label">Nombre completo *</label>
               <input className={`cf-input ${errores.nombre ? 'error' : ''}`} type="text" placeholder="Tu nombre completo" value={form.nombre} onChange={(e) => handleChange('nombre', e.target.value)} />
               {errores.nombre && <div className="cf-error">{errores.nombre}</div>}
             </div>
+
+            {/* Teléfono */}
             <div className="cf-section">
               <label className="cf-label">Teléfono *</label>
               <input className={`cf-input ${errores.telefono ? 'error' : ''}`} type="tel" placeholder="10 dígitos" value={form.telefono} onChange={(e) => handleChange('telefono', e.target.value)} />
               {errores.telefono && <div className="cf-error">{errores.telefono}</div>}
             </div>
+
+            {/* Email */}
             <div className="cf-section">
               <label className="cf-label">Correo electrónico <span style={{color:'#aaa',fontWeight:400,textTransform:'none'}}>(opcional)</span></label>
               <input className="cf-input" type="email" placeholder="tucorreo@ejemplo.com" value={form.email} onChange={(e) => handleChange('email', e.target.value)} />
             </div>
+
+            {/* Dirección */}
             <div className="cf-section">
               <label className="cf-label">Dirección de entrega *</label>
               <input className={`cf-input ${errores.direccion ? 'error' : ''}`} type="text" placeholder="Calle, número, colonia" value={form.direccion} onChange={(e) => handleChange('direccion', e.target.value)} />
               {errores.direccion && <div className="cf-error">{errores.direccion}</div>}
             </div>
+
+            {/* Ciudad y CP */}
             <div className="cf-section">
               <div className="cf-grid2">
                 <div>
@@ -206,10 +247,14 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
                 </div>
               </div>
             </div>
+
+            {/* Referencias */}
             <div className="cf-section">
               <label className="cf-label">Referencias <span style={{color:'#aaa',fontWeight:400,textTransform:'none'}}>(opcional)</span></label>
               <textarea className="cf-textarea" rows={3} placeholder="Entre calles, color de fachada, señas particulares..." value={form.referencias} onChange={(e) => handleChange('referencias', e.target.value)} />
             </div>
+
+            {/* Fecha de entrega */}
             <div className="cf-section">
               <label className="cf-label">Fecha de entrega</label>
               <div className="cf-fecha-box">
@@ -220,6 +265,8 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
                 </div>
               </div>
             </div>
+
+            {/* Forma de pago */}
             <div className="cf-section">
               <label className="cf-label">Forma de pago *</label>
               <div className="cf-pago-grid">
@@ -236,6 +283,8 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
               </div>
               {errores.formaPago && <div className="cf-error">{errores.formaPago}</div>}
             </div>
+
+            {/* Resumen */}
             <div className="cf-resumen">
               <div className="cf-resumen-title">Tu pedido</div>
               {cart.map(item => (
@@ -252,10 +301,12 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
                 <span className="cf-resumen-total-price">${totalPrice.toFixed(2)}</span>
               </div>
             </div>
+
             <button className="cf-enviar-btn" onClick={handleEnviar} disabled={loading || !form.formaPago}>
               {loading ? 'Enviando...' : !form.formaPago ? 'Elige una forma de pago' : '📲 Confirmar pedido'}
             </button>
             <div className="cf-nota">Al confirmar se procesará tu pedido.<br/>Te contactaremos para confirmar la entrega.</div>
+
           </div>
         </div>
       </div>
