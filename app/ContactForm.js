@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const WHATSAPP_NUMBER = '529611176006';
+const STORAGE_KEY = 'tyc_cliente';
 const DATOS_TRANSFERENCIA = {
   banco: 'BANAMEX',
   titular: 'Tierra y Campo',
@@ -14,6 +15,21 @@ const getFechaManana = () => {
   const manana = new Date();
   manana.setDate(manana.getDate() + 1);
   return manana.toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+};
+
+const cargarDatosGuardados = () => {
+  try {
+    const datos = localStorage.getItem(STORAGE_KEY);
+    return datos ? JSON.parse(datos) : null;
+  } catch { return null; }
+};
+
+const guardarDatos = (form) => {
+  try {
+    // Guardamos todo excepto la forma de pago
+    const { formaPago, ...resto } = form;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(resto));
+  } catch {}
 };
 
 export default function ContactForm({ cart, totalPrice, onClose }) {
@@ -28,11 +44,21 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
     referencias: '',
     formaPago: '',
   });
-  const [errores, setErrores] = useState({});
-  const [enviado, setEnviado] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [errores, setErrores]         = useState({});
+  const [enviado, setEnviado]         = useState(false);
+  const [loading, setLoading]         = useState(false);
+  const [datosGuardados, setDatosGuardados] = useState(false);
 
   const fechaEntrega = getFechaManana();
+
+  // Cargar datos guardados al abrir el formulario
+  useEffect(() => {
+    const saved = cargarDatosGuardados();
+    if (saved && saved.nombre) {
+      setForm(prev => ({ ...prev, ...saved }));
+      setDatosGuardados(true);
+    }
+  }, []);
 
   const validar = () => {
     const e = {};
@@ -51,6 +77,12 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
     if (errores[campo]) setErrores(prev => ({ ...prev, [campo]: null }));
   };
 
+  const limpiarDatos = () => {
+    try { localStorage.removeItem(STORAGE_KEY); } catch {}
+    setForm({ cumpleanos: '', nombre: '', telefono: '', email: '', direccion: '', ciudad: '', cp: '', referencias: '', formaPago: '' });
+    setDatosGuardados(false);
+  };
+
   const resumenProductos = cart.map(item =>
     `• ${item.emoji} ${item.name} (${item.detalle || item.unit}) — $${item.price}`
   ).join('\n');
@@ -67,6 +99,7 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
     const e = validar();
     if (Object.keys(e).length > 0) { setErrores(e); return; }
     setLoading(true);
+    guardarDatos(form); // Guardamos los datos para la próxima vez
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${mensajeWhatsApp()}`, '_blank');
     setTimeout(() => { setLoading(false); setEnviado(true); }, 800);
   };
@@ -96,7 +129,7 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
             <div className="cf-success-desc">
               Tu pedido fue enviado. Nos pondremos en contacto contigo para confirmar tu entrega del día siguiente.
               {form.cumpleanos && (
-                <div style={{marginTop:'12px', background:'#FFF0F5', borderRadius:'10px', padding:'12px', fontSize:'13px', color:'#C2185B'}}>
+                <div style={{marginTop:'12px',background:'#FFF0F5',borderRadius:'10px',padding:'12px',fontSize:'13px',color:'#C2185B'}}>
                   🎂 ¡Gracias por compartir tu fecha de cumpleaños! Te sorprenderemos ese día especial.
                 </div>
               )}
@@ -134,13 +167,18 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
         .cf-close{background:#f0f0f0;border:none;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#555;}
         .cf-close:hover{background:#ddd;}
         .cf-body{padding:0 28px 28px;}
+
+        /* Banner datos guardados */
+        .cf-saved-banner{background:#E1F5EE;border:1.5px solid #9FE1CB;border-radius:12px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+        .cf-saved-text{font-size:13px;color:#085041;}
+        .cf-saved-btn{font-size:12px;color:#E53E3E;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;white-space:nowrap;}
+
         .cf-cumple-box{background:linear-gradient(135deg,#FFF0F5,#FFE4F0);border:1.5px solid #F48FB1;border-radius:16px;padding:20px;margin-bottom:20px;text-align:center;}
         .cf-cumple-icon{font-size:36px;margin-bottom:8px;}
         .cf-cumple-title{font-family:'Fraunces',serif;font-size:18px;font-weight:300;color:#C2185B;margin-bottom:4px;}
         .cf-cumple-desc{font-size:12px;color:#888;margin-bottom:14px;line-height:1.5;}
         .cf-cumple-input{width:100%;border:1.5px solid #F48FB1;border-radius:12px;padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:15px;color:#1C1C1A;outline:none;box-sizing:border-box;background:white;}
         .cf-cumple-input:focus{border-color:#C2185B;}
-        .cf-cumple-skip{font-size:12px;color:#aaa;margin-top:8px;cursor:pointer;text-decoration:underline;background:none;border:none;font-family:'DM Sans',sans-serif;}
         .cf-divider{border:none;border-top:1px solid #f0f0f0;margin:4px 0 20px;}
         .cf-section{margin-bottom:18px;}
         .cf-label{font-size:12px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;display:block;}
@@ -190,49 +228,47 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
 
           <div className="cf-body">
 
+            {/* Banner datos guardados */}
+            {datosGuardados && (
+              <div className="cf-saved-banner">
+                <span className="cf-saved-text">✅ Tus datos fueron cargados automáticamente</span>
+                <button className="cf-saved-btn" onClick={limpiarDatos}>Usar otros datos</button>
+              </div>
+            )}
+
             {/* Fecha de cumpleaños */}
             <div className="cf-cumple-box">
               <div className="cf-cumple-icon">🎂</div>
               <div className="cf-cumple-title">¿Cuándo es tu cumpleaños?</div>
               <div className="cf-cumple-desc">Opcional — Te sorprenderemos ese día con un regalo especial 🎁</div>
-              <input
-                className="cf-cumple-input"
-                type="date"
-                value={form.cumpleanos}
-                onChange={(e) => handleChange('cumpleanos', e.target.value)}
-              />
+              <input className="cf-cumple-input" type="date" value={form.cumpleanos} onChange={(e) => handleChange('cumpleanos', e.target.value)} />
             </div>
 
             <hr className="cf-divider" />
 
-            {/* Nombre */}
             <div className="cf-section">
               <label className="cf-label">Nombre completo *</label>
               <input className={`cf-input ${errores.nombre ? 'error' : ''}`} type="text" placeholder="Tu nombre completo" value={form.nombre} onChange={(e) => handleChange('nombre', e.target.value)} />
               {errores.nombre && <div className="cf-error">{errores.nombre}</div>}
             </div>
 
-            {/* Teléfono */}
             <div className="cf-section">
               <label className="cf-label">Teléfono *</label>
               <input className={`cf-input ${errores.telefono ? 'error' : ''}`} type="tel" placeholder="10 dígitos" value={form.telefono} onChange={(e) => handleChange('telefono', e.target.value)} />
               {errores.telefono && <div className="cf-error">{errores.telefono}</div>}
             </div>
 
-            {/* Email */}
             <div className="cf-section">
               <label className="cf-label">Correo electrónico <span style={{color:'#aaa',fontWeight:400,textTransform:'none'}}>(opcional)</span></label>
               <input className="cf-input" type="email" placeholder="tucorreo@ejemplo.com" value={form.email} onChange={(e) => handleChange('email', e.target.value)} />
             </div>
 
-            {/* Dirección */}
             <div className="cf-section">
               <label className="cf-label">Dirección de entrega *</label>
               <input className={`cf-input ${errores.direccion ? 'error' : ''}`} type="text" placeholder="Calle, número, colonia" value={form.direccion} onChange={(e) => handleChange('direccion', e.target.value)} />
               {errores.direccion && <div className="cf-error">{errores.direccion}</div>}
             </div>
 
-            {/* Ciudad y CP */}
             <div className="cf-section">
               <div className="cf-grid2">
                 <div>
@@ -248,13 +284,11 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
               </div>
             </div>
 
-            {/* Referencias */}
             <div className="cf-section">
               <label className="cf-label">Referencias <span style={{color:'#aaa',fontWeight:400,textTransform:'none'}}>(opcional)</span></label>
               <textarea className="cf-textarea" rows={3} placeholder="Entre calles, color de fachada, señas particulares..." value={form.referencias} onChange={(e) => handleChange('referencias', e.target.value)} />
             </div>
 
-            {/* Fecha de entrega */}
             <div className="cf-section">
               <label className="cf-label">Fecha de entrega</label>
               <div className="cf-fecha-box">
@@ -266,7 +300,6 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
               </div>
             </div>
 
-            {/* Forma de pago */}
             <div className="cf-section">
               <label className="cf-label">Forma de pago *</label>
               <div className="cf-pago-grid">
@@ -284,7 +317,6 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
               {errores.formaPago && <div className="cf-error">{errores.formaPago}</div>}
             </div>
 
-            {/* Resumen */}
             <div className="cf-resumen">
               <div className="cf-resumen-title">Tu pedido</div>
               {cart.map(item => (
