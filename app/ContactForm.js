@@ -2,180 +2,272 @@
 
 import { useState } from 'react';
 
+const WHATSAPP_NUMBER = '529611176006';
+const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeucVNXfgJPLUxMoDhg1Rr0qoHJmbuDO6vd2KVtp2m1YF80tw/viewform';
+const DATOS_TRANSFERENCIA = {
+  banco: 'BANAMEX',
+  titular: 'Tierra y Campo',
+  cuenta: '4879375',
+  clabe: '002100702248793757',
+};
+
+const getFechaManana = () => {
+  const manana = new Date();
+  manana.setDate(manana.getDate() + 1);
+  return manana.toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+};
+
 export default function ContactForm({ cart, totalPrice, onClose }) {
-  const [formData, setFormData] = useState({
+  const [form, setForm] = useState({
     nombre: '',
     telefono: '',
+    email: '',
     direccion: '',
-    colonia: '',
-    referencias: ''
+    ciudad: '',
+    cp: '',
+    referencias: '',
+    formaPago: '',
   });
+  const [errores, setErrores] = useState({});
+  const [enviado, setEnviado] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+  const fechaEntrega = getFechaManana();
+
+  const validar = () => {
+    const e = {};
+    if (!form.nombre.trim()) e.nombre = 'El nombre es obligatorio';
+    if (!form.telefono.trim()) e.telefono = 'El teléfono es obligatorio';
+    else if (!/^\d{10}$/.test(form.telefono.replace(/\s/g, ''))) e.telefono = 'Escribe 10 dígitos';
+    if (!form.direccion.trim()) e.direccion = 'La dirección es obligatoria';
+    if (!form.ciudad.trim()) e.ciudad = 'La ciudad es obligatoria';
+    if (!form.cp.trim()) e.cp = 'El C.P. es obligatorio';
+    if (!form.formaPago) e.formaPago = 'Elige una forma de pago';
+    return e;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // Crear mensaje de WhatsApp
-    let mensaje = `*Nuevo Pedido - Tierra y Campo*%0A%0A`;
-    mensaje += `*Cliente:* ${formData.nombre}%0A`;
-    mensaje += `*Teléfono:* ${formData.telefono}%0A`;
-    mensaje += `*Dirección:* ${formData.direccion}, ${formData.colonia}%0A`;
-    mensaje += `*Referencias:* ${formData.referencias}%0A%0A`;
-    mensaje += `*Pedido:*%0A`;
-    
-    cart.forEach(item => {
-      mensaje += `- ${item.quantity} ${item.unit} de ${item.name}: $${(item.price * item.quantity).toFixed(2)}%0A`;
-    });
-    
-    mensaje += `%0A*Total: $${totalPrice.toFixed(2)}*%0A`;
-    mensaje += `%0A¡Gracias por tu compra! 🍋🍍`;
-
-    // Abrir WhatsApp
-    window.open(`https://wa.me/529611234567?text=${mensaje}`, '_blank');
-    onClose();
+  const handleChange = (campo, valor) => {
+    setForm(prev => ({ ...prev, [campo]: valor }));
+    if (errores[campo]) setErrores(prev => ({ ...prev, [campo]: null }));
   };
+
+  const resumenProductos = cart.map(item =>
+    `• ${item.emoji} ${item.name} (${item.detalle || item.unit}) — $${item.price}`
+  ).join('\n');
+
+  const mensajeWhatsApp = () => {
+    const textoTransferencia = form.formaPago === 'Transferencia'
+      ? `\n💳 *Datos para transferencia:*\nBanco: ${DATOS_TRANSFERENCIA.banco}\nTitular: ${DATOS_TRANSFERENCIA.titular}\nCuenta: ${DATOS_TRANSFERENCIA.cuenta}\nCLABE: ${DATOS_TRANSFERENCIA.clabe}\n\n📸 *Envía tu comprobante por WhatsApp con tu nombre completo.*`
+      : '';
+    const texto = `🌾 *NUEVO PEDIDO — Tierra & Campo*\n─────────────────────\n👤 *Cliente:* ${form.nombre}\n📱 *Teléfono:* ${form.telefono}${form.email ? `\n📧 *Email:* ${form.email}` : ''}\n📍 *Dirección:* ${form.direccion}\n🏙️ *Ciudad:* ${form.ciudad} | *C.P.:* ${form.cp}${form.referencias ? `\n🗺️ *Referencias:* ${form.referencias}` : ''}\n📅 *Entrega:* ${fechaEntrega}\n💳 *Pago:* ${form.formaPago}\n─────────────────────\n🛒 *Productos:*\n${resumenProductos}\n─────────────────────\n💰 *TOTAL: $${totalPrice.toFixed(2)}*${textoTransferencia}`;
+    return encodeURIComponent(texto);
+  };
+
+  const handleEnviar = () => {
+    const e = validar();
+    if (Object.keys(e).length > 0) { setErrores(e); return; }
+    setLoading(true);
+    const esCelular = /iPhone|Android|iPad/i.test(navigator.userAgent);
+    if (esCelular) {
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${mensajeWhatsApp()}`, '_blank');
+    } else {
+      const detalleProductos = cart.map(item =>
+        `${item.name} (${item.detalle || item.unit}) - $${item.price}`
+      ).join(', ');
+      const urlForm = `${GOOGLE_FORM_URL}?entry.2063785137=${encodeURIComponent(detalleProductos)}`;
+      window.open(urlForm, '_blank');
+    }
+    setTimeout(() => { setLoading(false); setEnviado(true); }, 800);
+  };
+
+  if (enviado) {
+    return (
+      <>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap');
+          .cf-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;display:flex;align-items:center;justify-content:center;padding:20px;font-family:'DM Sans',sans-serif;}
+          .cf-box{background:white;border-radius:24px;width:100%;max-width:460px;padding:40px;text-align:center;}
+          .cf-success-icon{font-size:64px;margin-bottom:16px;}
+          .cf-success-title{font-family:'Fraunces',serif;font-size:28px;font-weight:300;color:#085041;margin-bottom:12px;}
+          .cf-success-desc{font-size:15px;color:#666;line-height:1.6;margin-bottom:28px;}
+          .cf-transferencia-box{margin-top:16px;background:#E1F5EE;border-radius:12px;padding:16px;text-align:left;}
+          .cf-transferencia-title{color:#085041;font-weight:600;display:block;margin-bottom:8px;font-size:14px;}
+          .cf-transferencia-datos{font-size:13px;color:#444;line-height:1.8;}
+          .cf-comprobante-nota{margin-top:12px;background:#FFF8E1;border-radius:10px;padding:12px;font-size:13px;color:#856404;line-height:1.5;}
+          .cf-success-btn{background:#085041;color:white;border:none;padding:14px 32px;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;}
+          .cf-success-btn:hover{background:#1D9E75;}
+        `}</style>
+        <div className="cf-overlay">
+          <div className="cf-box">
+            <div className="cf-success-icon">🎉</div>
+            <div className="cf-success-title">¡Pedido enviado!</div>
+            <div className="cf-success-desc">
+              Tu pedido fue enviado. Nos pondremos en contacto contigo para confirmar tu entrega del día siguiente.
+              {form.formaPago === 'Transferencia' && (
+                <div className="cf-transferencia-box">
+                  <span className="cf-transferencia-title">🏦 Datos para transferencia:</span>
+                  <div className="cf-transferencia-datos">
+                    Banco: <strong>{DATOS_TRANSFERENCIA.banco}</strong><br/>
+                    Titular: <strong>{DATOS_TRANSFERENCIA.titular}</strong><br/>
+                    Cuenta: <strong>{DATOS_TRANSFERENCIA.cuenta}</strong><br/>
+                    CLABE: <strong>{DATOS_TRANSFERENCIA.clabe}</strong>
+                  </div>
+                  <div className="cf-comprobante-nota">
+                    📸 Envía tu comprobante por WhatsApp al {WHATSAPP_NUMBER.replace('52', '')} con tu nombre completo para confirmar tu pedido.
+                  </div>
+                </div>
+              )}
+            </div>
+            <button className="cf-success-btn" onClick={onClose}>Volver a la tienda</button>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 2000
-    }}>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '30px',
-        borderRadius: '15px',
-        maxWidth: '500px',
-        width: '90%',
-        maxHeight: '90vh',
-        overflow: 'auto'
-      }}>
-        <h2 style={{ color: '#2d5016', marginBottom: '20px', textAlign: 'center' }}>📋 Datos de Entrega</h2>
-        
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', color: '#333', fontWeight: 'bold' }}>Nombre completo:</label>
-            <input
-              type="text"
-              name="nombre"
-              value={formData.nombre}
-              onChange={handleChange}
-              required
-              style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '5px', fontSize: '1em' }}
-            />
-          </div>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap');
+        .cf-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;display:flex;align-items:center;justify-content:center;padding:20px;font-family:'DM Sans',sans-serif;}
+        .cf-box{background:white;border-radius:24px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;position:relative;}
+        .cf-header{padding:28px 28px 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+        .cf-title{font-family:'Fraunces',serif;font-size:24px;font-weight:300;color:#085041;}
+        .cf-close{background:#f0f0f0;border:none;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#555;}
+        .cf-close:hover{background:#ddd;}
+        .cf-body{padding:0 28px 28px;}
+        .cf-section{margin-bottom:18px;}
+        .cf-label{font-size:12px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;display:block;}
+        .cf-input{width:100%;border:1.5px solid rgba(0,0,0,0.12);border-radius:12px;padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:15px;color:#1C1C1A;outline:none;transition:border-color 0.2s;box-sizing:border-box;}
+        .cf-input:focus{border-color:#1D9E75;}
+        .cf-input.error{border-color:#E53E3E;}
+        .cf-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+        .cf-textarea{width:100%;border:1.5px solid rgba(0,0,0,0.12);border-radius:12px;padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:15px;color:#1C1C1A;outline:none;transition:border-color 0.2s;resize:none;box-sizing:border-box;}
+        .cf-textarea:focus{border-color:#1D9E75;}
+        .cf-error{font-size:12px;color:#E53E3E;margin-top:4px;}
+        .cf-fecha-box{background:#E1F5EE;border:1.5px solid #9FE1CB;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;}
+        .cf-fecha-texto{font-size:14px;color:#085041;font-weight:500;}
+        .cf-fecha-sub{font-size:12px;color:#1D9E75;margin-top:2px;}
+        .cf-pago-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+        .cf-pago-btn{border:2px solid rgba(0,0,0,0.1);border-radius:14px;padding:16px 12px;text-align:center;cursor:pointer;background:white;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+        .cf-pago-btn:hover{border-color:#1D9E75;}
+        .cf-pago-btn.active{border-color:#085041;background:#E1F5EE;}
+        .cf-pago-icon{font-size:24px;display:block;margin-bottom:6px;}
+        .cf-pago-label{font-size:14px;font-weight:600;color:#1C1C1A;display:block;}
+        .cf-pago-desc{font-size:11px;color:#888;display:block;margin-top:2px;}
+        .cf-resumen{background:#F7F6F2;border-radius:12px;padding:16px;margin-bottom:20px;}
+        .cf-resumen-title{font-size:12px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;}
+        .cf-resumen-item{display:flex;justify-content:space-between;align-items:flex-start;font-size:14px;color:#444;padding:6px 0;border-bottom:1px solid rgba(0,0,0,0.06);}
+        .cf-resumen-item:last-child{border-bottom:none;}
+        .cf-resumen-item-det{font-size:12px;color:#888;}
+        .cf-resumen-item-price{font-weight:600;color:#085041;flex-shrink:0;margin-left:8px;}
+        .cf-resumen-total{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px;padding-top:12px;border-top:2px solid #085041;}
+        .cf-resumen-total-label{font-size:14px;color:#888;}
+        .cf-resumen-total-price{font-family:'Fraunces',serif;font-size:26px;font-weight:300;color:#085041;}
+        .cf-enviar-btn{width:100%;background:#085041;color:white;border:none;padding:16px;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:background 0.2s;}
+        .cf-enviar-btn:hover:not(:disabled){background:#1D9E75;}
+        .cf-enviar-btn:disabled{background:#ccc;cursor:not-allowed;}
+        .cf-nota{font-size:11px;color:#aaa;text-align:center;margin-top:10px;line-height:1.5;}
+        @media(max-width:600px){
+          .cf-box{border-radius:20px 20px 0 0;position:fixed;bottom:0;left:0;right:0;max-height:95vh;}
+          .cf-overlay{align-items:flex-end;padding:0;}
+          .cf-grid2{grid-template-columns:1fr;}
+        }
+      `}</style>
 
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', color: '#333', fontWeight: 'bold' }}>Teléfono (WhatsApp):</label>
-            <input
-              type="tel"
-              name="telefono"
-              value={formData.telefono}
-              onChange={handleChange}
-              required
-              placeholder="961-XXX-XXXX"
-              style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '5px', fontSize: '1em' }}
-            />
+      <div className="cf-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+        <div className="cf-box">
+          <div className="cf-header">
+            <div className="cf-title">Finalizar pedido</div>
+            <button className="cf-close" onClick={onClose}>✕</button>
           </div>
-
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', color: '#333', fontWeight: 'bold' }}>Dirección:</label>
-            <input
-              type="text"
-              name="direccion"
-              value={formData.direccion}
-              onChange={handleChange}
-              required
-              placeholder="Calle, número"
-              style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '5px', fontSize: '1em' }}
-            />
-          </div>
-
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', color: '#333', fontWeight: 'bold' }}>Colonia:</label>
-            <input
-              type="text"
-              name="colonia"
-              value={formData.colonia}
-              onChange={handleChange}
-              required
-              style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '5px', fontSize: '1em' }}
-            />
-          </div>
-
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', color: '#333', fontWeight: 'bold' }}>Referencias (opcional):</label>
-            <textarea
-              name="referencias"
-              value={formData.referencias}
-              onChange={handleChange}
-              placeholder="Casa verde, portón negro, etc."
-              rows="3"
-              style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '5px', fontSize: '1em' }}
-            />
-          </div>
-
-          <div style={{ backgroundColor: '#f5f5f5', padding: '15px', borderRadius: '10px', marginBottom: '20px' }}>
-            <h3 style={{ color: '#2d5016', margin: '0 0 10px 0' }}>Resumen del pedido:</h3>
-            {cart.map(item => (
-              <p key={item.id} style={{ margin: '5px 0', color: '#666' }}>
-                {item.quantity} {item.unit} de {item.name}: ${(item.price * item.quantity).toFixed(2)}
-              </p>
-            ))}
-            <p style={{ fontWeight: 'bold', color: '#2d5016', fontSize: '1.2em', marginTop: '10px' }}>
-              Total: ${totalPrice.toFixed(2)}
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button
-              type="submit"
-              style={{
-                flex: 1,
-                backgroundColor: '#25D366',
-                color: 'white',
-                border: 'none',
-                padding: '15px',
-                borderRadius: '5px',
-                fontSize: '1.1em',
-                cursor: 'pointer',
-                fontWeight: 'bold'
-              }}
-            >
-              📱 Enviar por WhatsApp
+          <div className="cf-body">
+            <div className="cf-section">
+              <label className="cf-label">Nombre completo *</label>
+              <input className={`cf-input ${errores.nombre ? 'error' : ''}`} type="text" placeholder="Tu nombre completo" value={form.nombre} onChange={(e) => handleChange('nombre', e.target.value)} />
+              {errores.nombre && <div className="cf-error">{errores.nombre}</div>}
+            </div>
+            <div className="cf-section">
+              <label className="cf-label">Teléfono *</label>
+              <input className={`cf-input ${errores.telefono ? 'error' : ''}`} type="tel" placeholder="10 dígitos" value={form.telefono} onChange={(e) => handleChange('telefono', e.target.value)} />
+              {errores.telefono && <div className="cf-error">{errores.telefono}</div>}
+            </div>
+            <div className="cf-section">
+              <label className="cf-label">Correo electrónico <span style={{color:'#aaa',fontWeight:400,textTransform:'none'}}>(opcional)</span></label>
+              <input className="cf-input" type="email" placeholder="tucorreo@ejemplo.com" value={form.email} onChange={(e) => handleChange('email', e.target.value)} />
+            </div>
+            <div className="cf-section">
+              <label className="cf-label">Dirección de entrega *</label>
+              <input className={`cf-input ${errores.direccion ? 'error' : ''}`} type="text" placeholder="Calle, número, colonia" value={form.direccion} onChange={(e) => handleChange('direccion', e.target.value)} />
+              {errores.direccion && <div className="cf-error">{errores.direccion}</div>}
+            </div>
+            <div className="cf-section">
+              <div className="cf-grid2">
+                <div>
+                  <label className="cf-label">Ciudad *</label>
+                  <input className={`cf-input ${errores.ciudad ? 'error' : ''}`} type="text" placeholder="Tuxtla Gutiérrez" value={form.ciudad} onChange={(e) => handleChange('ciudad', e.target.value)} />
+                  {errores.ciudad && <div className="cf-error">{errores.ciudad}</div>}
+                </div>
+                <div>
+                  <label className="cf-label">C.P. *</label>
+                  <input className={`cf-input ${errores.cp ? 'error' : ''}`} type="text" placeholder="29000" value={form.cp} onChange={(e) => handleChange('cp', e.target.value)} />
+                  {errores.cp && <div className="cf-error">{errores.cp}</div>}
+                </div>
+              </div>
+            </div>
+            <div className="cf-section">
+              <label className="cf-label">Referencias <span style={{color:'#aaa',fontWeight:400,textTransform:'none'}}>(opcional)</span></label>
+              <textarea className="cf-textarea" rows={3} placeholder="Entre calles, color de fachada, señas particulares..." value={form.referencias} onChange={(e) => handleChange('referencias', e.target.value)} />
+            </div>
+            <div className="cf-section">
+              <label className="cf-label">Fecha de entrega</label>
+              <div className="cf-fecha-box">
+                <span style={{fontSize:'20px'}}>📅</span>
+                <div>
+                  <div className="cf-fecha-texto">{fechaEntrega}</div>
+                  <div className="cf-fecha-sub">Entrega día siguiente — pedidos antes de las 9pm</div>
+                </div>
+              </div>
+            </div>
+            <div className="cf-section">
+              <label className="cf-label">Forma de pago *</label>
+              <div className="cf-pago-grid">
+                <button className={`cf-pago-btn ${form.formaPago === 'Efectivo' ? 'active' : ''}`} onClick={() => handleChange('formaPago', 'Efectivo')}>
+                  <span className="cf-pago-icon">💵</span>
+                  <span className="cf-pago-label">Efectivo</span>
+                  <span className="cf-pago-desc">Al momento de la entrega</span>
+                </button>
+                <button className={`cf-pago-btn ${form.formaPago === 'Transferencia' ? 'active' : ''}`} onClick={() => handleChange('formaPago', 'Transferencia')}>
+                  <span className="cf-pago-icon">🏦</span>
+                  <span className="cf-pago-label">Transferencia</span>
+                  <span className="cf-pago-desc">Te enviamos los datos</span>
+                </button>
+              </div>
+              {errores.formaPago && <div className="cf-error">{errores.formaPago}</div>}
+            </div>
+            <div className="cf-resumen">
+              <div className="cf-resumen-title">Tu pedido</div>
+              {cart.map(item => (
+                <div key={item.id} className="cf-resumen-item">
+                  <div>
+                    <div>{item.emoji} {item.name}</div>
+                    <div className="cf-resumen-item-det">{item.detalle || item.unit}</div>
+                  </div>
+                  <div className="cf-resumen-item-price">${item.price}</div>
+                </div>
+              ))}
+              <div className="cf-resumen-total">
+                <span className="cf-resumen-total-label">Total</span>
+                <span className="cf-resumen-total-price">${totalPrice.toFixed(2)}</span>
+              </div>
+            </div>
+            <button className="cf-enviar-btn" onClick={handleEnviar} disabled={loading || !form.formaPago}>
+              {loading ? 'Enviando...' : !form.formaPago ? 'Elige una forma de pago' : '📲 Confirmar pedido'}
             </button>
-            <button
-              type="button"
-              onClick={onClose}
-              style={{
-                flex: 1,
-                backgroundColor: '#666',
-                color: 'white',
-                border: 'none',
-                padding: '15px',
-                borderRadius: '5px',
-                fontSize: '1.1em',
-                cursor: 'pointer'
-              }}
-            >
-              Cancelar
-            </button>
+            <div className="cf-nota">Al confirmar se procesará tu pedido.<br/>Te contactaremos para confirmar la entrega.</div>
           </div>
-        </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
