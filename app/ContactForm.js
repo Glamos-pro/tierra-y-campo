@@ -67,16 +67,7 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
     const e = validar();
     if (Object.keys(e).length > 0) { setErrores(e); return; }
     setLoading(true);
-    const esCelular = /iPhone|Android|iPad/i.test(navigator.userAgent);
-    if (esCelular) {
-      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${mensajeWhatsApp()}`, '_blank');
-    } else {
-      const detalleProductos = cart.map(item =>
-        `${item.name} (${item.detalle || item.unit}) - $${item.price}`
-      ).join(', ');
-      const urlForm = `${GOOGLE_FORM_URL}?entry.2063785137=${encodeURIComponent(detalleProductos)}`;
-      window.open(urlForm, '_blank');
-    }
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${mensajeWhatsApp()}`, '_blank');
     setTimeout(() => { setLoading(false); setEnviado(true); }, 800);
   };
 
