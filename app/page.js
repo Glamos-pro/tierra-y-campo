@@ -557,10 +557,14 @@ export default function Home() {
         </div>
 
         <footer className="tyc-footer">
-          <strong>Tierra & Campo</strong><br/>
-          Tu tiempo vale. Tu despensa también.<br/>
-          © 2026 · Hecho con ❤️ en Chiapas, México
-        </footer>
+  <strong>Tierra & Campo</strong><br/>
+  Tu tiempo vale. Tu despensa también.<br/>
+  © 2026 · Hecho con ❤️ en Chiapas, México<br/>
+  <div style={{marginTop:'12px', display:'flex', justifyContent:'center', gap:'20px'}}>
+    <a href="/terminos" style={{color:'rgba(255,255,255,0.6)', fontSize:'12px', textDecoration:'underline'}}>Términos y Condiciones</a>
+    <a href="/privacidad" style={{color:'rgba(255,255,255,0.6)', fontSize:'12px', textDecoration:'underline'}}>Aviso de Privacidad</a>
+  </div>
+</footer>
 
         {productoSeleccionado && !esNegocio && (
           <PopupHogar product={productoSeleccionado} descuento={descuento} onAdd={handleAdd} onClose={() => setProducto(null)} />

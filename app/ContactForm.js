@@ -334,9 +334,26 @@ export default function ContactForm({ cart, totalPrice, onClose }) {
               </div>
             </div>
 
-            <button className="cf-enviar-btn" onClick={handleEnviar} disabled={loading || !form.formaPago}>
-              {loading ? 'Enviando...' : !form.formaPago ? 'Elige una forma de pago' : '📲 Confirmar pedido'}
-            </button>
+            <div style={{marginBottom:'16px'}}>
+  <label style={{display:'flex', alignItems:'flex-start', gap:'10px', cursor:'pointer', fontSize:'13px', color:'#555'}}>
+    <input
+      type="checkbox"
+      checked={form.aceptaTerminos || false}
+      onChange={(e) => handleChange('aceptaTerminos', e.target.checked)}
+      style={{marginTop:'2px', flexShrink:0, width:'16px', height:'16px', accentColor:'#085041'}}
+    />
+    <span>
+      He leído y acepto los{' '}
+      <a href="/terminos" target="_blank" style={{color:'#085041', fontWeight:'500'}}>Términos y Condiciones</a>
+      {' '}y el{' '}
+      <a href="/privacidad" target="_blank" style={{color:'#085041', fontWeight:'500'}}>Aviso de Privacidad</a>
+    </span>
+  </label>
+</div>
+
+<button className="cf-enviar-btn" onClick={handleEnviar} disabled={loading || !form.formaPago || !form.aceptaTerminos}>
+  {loading ? 'Enviando...' : !form.formaPago ? 'Elige una forma de pago' : !form.aceptaTerminos ? 'Acepta los términos para continuar' : '📲 Confirmar pedido'}
+</button>
             <div className="cf-nota">Al confirmar se procesará tu pedido.<br/>Te contactaremos para confirmar la entrega.</div>
 
           </div>
