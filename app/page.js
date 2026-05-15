@@ -211,7 +211,25 @@ export default function Home() {
   const [categoriaActiva, setCat]           = useState('Todos');
   const [productoSeleccionado, setProducto] = useState(null);
   const [mounted, setMounted]               = useState(false);
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+    script.onload = () => {
+      const el = document.getElementById('qr-code-tienda');
+      if (el && !el.hasChildNodes()) {
+        new window.QRCode(el, {
+          text: 'https://tierra-y-campo.vercel.app',
+          width: 180,
+          height: 180,
+          colorDark: '#085041',
+          colorLight: '#ffffff',
+          correctLevel: window.QRCode.CorrectLevel.H
+        });
+      }
+    };
+    document.body.appendChild(script);
+  }, []);
   if (!mounted) return null;
 
   const descuento = perfil ? DESCUENTOS[perfil.id] : 1;
@@ -245,6 +263,21 @@ export default function Home() {
           .sel-badge { display: inline-block; margin-top: 12px; font-size: 11px; font-weight: 500; color: #1D9E75; background: #E1F5EE; padding: 3px 10px; border-radius: 100px; }
           .wa-float { position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 150; text-decoration: none; font-size: 32px; transition: transform 0.2s; }
           .wa-float:hover { transform: scale(1.1); }
+        .tyc-qr { background: #085041; padding: 60px 40px; }
+        .tyc-qr-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+        .tyc-qr-title { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 300; color: white; margin-bottom: 16px; letter-spacing: -0.5px; }
+        .tyc-qr-desc { font-size: 15px; color: rgba(255,255,255,0.75); line-height: 1.7; margin-bottom: 28px; }
+        .tyc-qr-pasos { display: flex; flex-direction: column; gap: 12px; }
+        .tyc-qr-paso { display: flex; align-items: center; gap: 12px; font-size: 14px; color: rgba(255,255,255,0.85); }
+        .tyc-qr-num { width: 28px; height: 28px; border-radius: 50%; background: #1D9E75; color: white; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .tyc-qr-card { background: white; border-radius: 20px; padding: 28px; text-align: center; max-width: 280px; margin: 0 auto; }
+        .tyc-qr-tag { font-size: 12px; font-weight: 600; color: #1D9E75; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+        .tyc-qr-scan { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 300; color: #085041; margin-bottom: 4px; }
+        .tyc-qr-sub { font-size: 12px; color: #888; margin-bottom: 16px; }
+        .tyc-qr-code { display: flex; justify-content: center; margin-bottom: 16px; }
+        .tyc-qr-url { font-size: 11px; color: #aaa; margin-bottom: 4px; }
+        .tyc-qr-fresh { font-size: 11px; color: #1D9E75; }
+        @media (max-width: 700px) { .tyc-qr { padding: 40px 20px; } .tyc-qr-inner { grid-template-columns: 1fr; gap: 32px; } }
         .tyc-nosotros { background: white; border-top: 1px solid rgba(0,0,0,0.06); padding: 60px 40px; }
         .tyc-nosotros-inner { max-width: 1100px; margin: 0 auto; }
         .tyc-nosotros-title { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 300; color: #085041; text-align: center; margin-bottom: 40px; }
@@ -271,9 +304,7 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <a className="wa-float" href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" width="35" height="35" />
-</a>
+        <a className="wa-float" href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer">💬</a>
       </>
     );
   }
@@ -390,6 +421,21 @@ export default function Home() {
         .tyc-footer strong { color: white; font-size: 15px; }
         .wa-float { position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 150; text-decoration: none; font-size: 32px; transition: transform 0.2s; }
         .wa-float:hover { transform: scale(1.1); }
+        .tyc-qr { background: #085041; padding: 60px 40px; }
+        .tyc-qr-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+        .tyc-qr-title { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 300; color: white; margin-bottom: 16px; letter-spacing: -0.5px; }
+        .tyc-qr-desc { font-size: 15px; color: rgba(255,255,255,0.75); line-height: 1.7; margin-bottom: 28px; }
+        .tyc-qr-pasos { display: flex; flex-direction: column; gap: 12px; }
+        .tyc-qr-paso { display: flex; align-items: center; gap: 12px; font-size: 14px; color: rgba(255,255,255,0.85); }
+        .tyc-qr-num { width: 28px; height: 28px; border-radius: 50%; background: #1D9E75; color: white; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .tyc-qr-card { background: white; border-radius: 20px; padding: 28px; text-align: center; max-width: 280px; margin: 0 auto; }
+        .tyc-qr-tag { font-size: 12px; font-weight: 600; color: #1D9E75; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+        .tyc-qr-scan { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 300; color: #085041; margin-bottom: 4px; }
+        .tyc-qr-sub { font-size: 12px; color: #888; margin-bottom: 16px; }
+        .tyc-qr-code { display: flex; justify-content: center; margin-bottom: 16px; }
+        .tyc-qr-url { font-size: 11px; color: #aaa; margin-bottom: 4px; }
+        .tyc-qr-fresh { font-size: 11px; color: #1D9E75; }
+        @media (max-width: 700px) { .tyc-qr { padding: 40px 20px; } .tyc-qr-inner { grid-template-columns: 1fr; gap: 32px; } }
         .tyc-nosotros { background: white; border-top: 1px solid rgba(0,0,0,0.06); padding: 60px 40px; }
         .tyc-nosotros-inner { max-width: 1100px; margin: 0 auto; }
         .tyc-nosotros-title { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 300; color: #085041; text-align: center; margin-bottom: 40px; }
@@ -516,6 +562,29 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Sección QR */}
+        <div className="tyc-qr">
+          <div className="tyc-qr-inner">
+            <div className="tyc-qr-texto">
+              <h2 className="tyc-qr-title">¿Tienes nuestro QR?</h2>
+              <p className="tyc-qr-desc">Pégalo en tu refrigerador y la próxima vez que necesites productos frescos, solo escanéalo y haz tu pedido en segundos.</p>
+              <div className="tyc-qr-pasos">
+                <div className="tyc-qr-paso"><span className="tyc-qr-num">1</span><span>Escanea el código QR</span></div>
+                <div className="tyc-qr-paso"><span className="tyc-qr-num">2</span><span>Elige tus productos</span></div>
+                <div className="tyc-qr-paso"><span className="tyc-qr-num">3</span><span>Recibe al día siguiente</span></div>
+              </div>
+            </div>
+            <div className="tyc-qr-card">
+              <div className="tyc-qr-tag">Tierra & Campo</div>
+              <div className="tyc-qr-scan">Escanéame</div>
+              <div className="tyc-qr-sub">y haz tu pedido de productos frescos</div>
+              <div id="qr-code-tienda" className="tyc-qr-code"></div>
+              <div className="tyc-qr-url">tierra-y-campo.vercel.app</div>
+              <div className="tyc-qr-fresh">🌾 Productos frescos · Entrega día siguiente</div>
+            </div>
+          </div>
+        </div>
+
         <footer className="tyc-footer">
           <strong>Tierra & Campo</strong><br/>
           Tu tiempo vale. Tu despensa también.<br/>
@@ -573,9 +642,7 @@ export default function Home() {
         )}
 
         {/* Botón flotante WhatsApp */}
-        <a className="wa-float" href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" width="35" height="35" />
-</a>
+        <a className="wa-float" href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer">💬</a>
       </div>
     </>
   );
