@@ -211,25 +211,7 @@ export default function Home() {
   const [categoriaActiva, setCat]           = useState('Todos');
   const [productoSeleccionado, setProducto] = useState(null);
   const [mounted, setMounted]               = useState(false);
-  useEffect(() => {
-    setMounted(true);
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
-    script.onload = () => {
-      const el = document.getElementById('qr-code-tienda');
-      if (el && !el.hasChildNodes()) {
-        new window.QRCode(el, {
-          text: 'https://tierra-y-campo.vercel.app',
-          width: 180,
-          height: 180,
-          colorDark: '#085041',
-          colorLight: '#ffffff',
-          correctLevel: window.QRCode.CorrectLevel.H
-        });
-      }
-    };
-    document.body.appendChild(script);
-  }, []);
+  useEffect(() => setMounted(true), []);
   if (!mounted) return null;
 
   const descuento = perfil ? DESCUENTOS[perfil.id] : 1;
@@ -261,31 +243,8 @@ export default function Home() {
           .sel-card-label { font-weight: 600; font-size: 16px; color: #085041; margin-bottom: 8px; }
           .sel-card-desc { font-size: 12px; color: #999; line-height: 1.5; }
           .sel-badge { display: inline-block; margin-top: 12px; font-size: 11px; font-weight: 500; color: #1D9E75; background: #E1F5EE; padding: 3px 10px; border-radius: 100px; }
-          .wa-float { position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 150; text-decoration: none; font-size: 32px; transition: transform 0.2s; }
+          .wa-float { position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 150; text-decoration: none; transition: transform 0.2s; }
           .wa-float:hover { transform: scale(1.1); }
-        .tyc-qr { background: #085041; padding: 60px 40px; }
-        .tyc-qr-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-        .tyc-qr-title { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 300; color: white; margin-bottom: 16px; letter-spacing: -0.5px; }
-        .tyc-qr-desc { font-size: 15px; color: rgba(255,255,255,0.75); line-height: 1.7; margin-bottom: 28px; }
-        .tyc-qr-pasos { display: flex; flex-direction: column; gap: 12px; }
-        .tyc-qr-paso { display: flex; align-items: center; gap: 12px; font-size: 14px; color: rgba(255,255,255,0.85); }
-        .tyc-qr-num { width: 28px; height: 28px; border-radius: 50%; background: #1D9E75; color: white; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .tyc-qr-card { background: white; border-radius: 20px; padding: 28px; text-align: center; max-width: 280px; margin: 0 auto; }
-        .tyc-qr-tag { font-size: 12px; font-weight: 600; color: #1D9E75; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
-        .tyc-qr-scan { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 300; color: #085041; margin-bottom: 4px; }
-        .tyc-qr-sub { font-size: 12px; color: #888; margin-bottom: 16px; }
-        .tyc-qr-code { display: flex; justify-content: center; margin-bottom: 16px; }
-        .tyc-qr-url { font-size: 11px; color: #aaa; margin-bottom: 4px; }
-        .tyc-qr-fresh { font-size: 11px; color: #1D9E75; }
-        @media (max-width: 700px) { .tyc-qr { padding: 40px 20px; } .tyc-qr-inner { grid-template-columns: 1fr; gap: 32px; } }
-        .tyc-nosotros { background: white; border-top: 1px solid rgba(0,0,0,0.06); padding: 60px 40px; }
-        .tyc-nosotros-inner { max-width: 1100px; margin: 0 auto; }
-        .tyc-nosotros-title { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 300; color: #085041; text-align: center; margin-bottom: 40px; }
-        .tyc-nosotros-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
-        .tyc-nosotros-card { background: #F7F6F2; border-radius: 16px; padding: 28px; }
-        .tyc-nosotros-card-icon { font-size: 32px; margin-bottom: 12px; }
-        .tyc-nosotros-card-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 300; color: #085041; margin-bottom: 12px; }
-        .tyc-nosotros-card-text { font-size: 14px; color: #666; line-height: 1.7; }
           @media (max-width: 600px) { .sel-title { font-size: 26px; } .sel-grid { grid-template-columns: 1fr 1fr; } }
         `}</style>
         <div className="sel-root">
@@ -304,7 +263,9 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <a className="wa-float" href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer">💬</a>
+        <a className="wa-float" href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" width="35" height="35" />
+        </a>
       </>
     );
   }
@@ -337,6 +298,14 @@ export default function Home() {
         .tyc-stats-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; text-align: center; }
         .tyc-stat-num { font-family: 'Fraunces', serif; font-size: 38px; font-weight: 300; color: #9FE1CB; line-height: 1; }
         .tyc-stat-label { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 6px; }
+        .tyc-nosotros { background: white; border-top: 1px solid rgba(0,0,0,0.06); padding: 60px 40px; }
+        .tyc-nosotros-inner { max-width: 1100px; margin: 0 auto; }
+        .tyc-nosotros-title { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 300; color: #085041; text-align: center; margin-bottom: 40px; }
+        .tyc-nosotros-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+        .tyc-nosotros-card { background: #F7F6F2; border-radius: 16px; padding: 28px; }
+        .tyc-nosotros-card-icon { font-size: 32px; margin-bottom: 12px; }
+        .tyc-nosotros-card-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 300; color: #085041; margin-bottom: 12px; }
+        .tyc-nosotros-card-text { font-size: 14px; color: #666; line-height: 1.7; }
         .tyc-products { max-width: 1100px; margin: 0 auto; padding: 56px 40px; }
         .tyc-section-title { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 300; color: #085041; margin-bottom: 24px; }
         .tyc-descuento-banner { background: #E1F5EE; border: 1px solid #9FE1CB; border-radius: 12px; padding: 14px 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; font-size: 14px; color: #085041; }
@@ -417,10 +386,6 @@ export default function Home() {
         .tyc-envio-icon { font-size: 20px; background: #E1F5EE; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .tyc-envio-label { font-weight: 500; font-size: 13px; color: #1C1C1A; margin-bottom: 3px; }
         .tyc-envio-desc { font-size: 12px; color: #888; line-height: 1.5; }
-        .tyc-footer { background: #085041; color: rgba(255,255,255,0.7); text-align: center; padding: 28px 40px; font-size: 13px; line-height: 1.8; }
-        .tyc-footer strong { color: white; font-size: 15px; }
-        .wa-float { position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 150; text-decoration: none; font-size: 32px; transition: transform 0.2s; }
-        .wa-float:hover { transform: scale(1.1); }
         .tyc-qr { background: #085041; padding: 60px 40px; }
         .tyc-qr-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
         .tyc-qr-title { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 300; color: white; margin-bottom: 16px; letter-spacing: -0.5px; }
@@ -435,24 +400,22 @@ export default function Home() {
         .tyc-qr-code { display: flex; justify-content: center; margin-bottom: 16px; }
         .tyc-qr-url { font-size: 11px; color: #aaa; margin-bottom: 4px; }
         .tyc-qr-fresh { font-size: 11px; color: #1D9E75; }
-        @media (max-width: 700px) { .tyc-qr { padding: 40px 20px; } .tyc-qr-inner { grid-template-columns: 1fr; gap: 32px; } }
-        .tyc-nosotros { background: white; border-top: 1px solid rgba(0,0,0,0.06); padding: 60px 40px; }
-        .tyc-nosotros-inner { max-width: 1100px; margin: 0 auto; }
-        .tyc-nosotros-title { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 300; color: #085041; text-align: center; margin-bottom: 40px; }
-        .tyc-nosotros-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
-        .tyc-nosotros-card { background: #F7F6F2; border-radius: 16px; padding: 28px; }
-        .tyc-nosotros-card-icon { font-size: 32px; margin-bottom: 12px; }
-        .tyc-nosotros-card-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 300; color: #085041; margin-bottom: 12px; }
-        .tyc-nosotros-card-text { font-size: 14px; color: #666; line-height: 1.7; }
+        .tyc-footer { background: #085041; color: rgba(255,255,255,0.7); text-align: center; padding: 28px 40px; font-size: 13px; line-height: 1.8; }
+        .tyc-footer strong { color: white; font-size: 15px; }
+        .wa-float { position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 150; text-decoration: none; transition: transform 0.2s; }
+        .wa-float:hover { transform: scale(1.1); }
         @media (max-width: 700px) {
           .tyc-nav { padding: 0 16px; }
           .tyc-hero { grid-template-columns: 1fr; padding: 36px 20px; gap: 28px; }
           .tyc-hero h1 { font-size: 34px; }
           .tyc-hero-visual { display: none; }
           .tyc-stats-inner { grid-template-columns: 1fr; gap: 20px; }
+          .tyc-nosotros { padding: 40px 20px; }
           .tyc-products { padding: 36px 20px; }
           .tyc-cart-panel { width: 100%; }
           .popup-box { padding: 24px; }
+          .tyc-qr { padding: 40px 20px; }
+          .tyc-qr-inner { grid-template-columns: 1fr; gap: 32px; }
         }
       `}</style>
 
@@ -565,7 +528,7 @@ export default function Home() {
         {/* Sección QR */}
         <div className="tyc-qr">
           <div className="tyc-qr-inner">
-            <div className="tyc-qr-texto">
+            <div>
               <h2 className="tyc-qr-title">¿Tienes nuestro QR?</h2>
               <p className="tyc-qr-desc">Pégalo en tu refrigerador y la próxima vez que necesites productos frescos, solo escanéalo y haz tu pedido en segundos.</p>
               <div className="tyc-qr-pasos">
@@ -578,7 +541,15 @@ export default function Home() {
               <div className="tyc-qr-tag">Tierra & Campo</div>
               <div className="tyc-qr-scan">Escanéame</div>
               <div className="tyc-qr-sub">y haz tu pedido de productos frescos</div>
-              <div id="qr-code-tienda" className="tyc-qr-code"></div>
+              <div className="tyc-qr-code">
+                <img
+                  src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https%3A%2F%2Ftierra-y-campo.vercel.app&color=085041&bgcolor=ffffff"
+                  alt="QR Tierra y Campo"
+                  width="180"
+                  height="180"
+                  style={{borderRadius:'8px'}}
+                />
+              </div>
               <div className="tyc-qr-url">tierra-y-campo.vercel.app</div>
               <div className="tyc-qr-fresh">🌾 Productos frescos · Entrega día siguiente</div>
             </div>
@@ -641,8 +612,9 @@ export default function Home() {
           <ContactForm cart={cart} totalPrice={getTotalPrice()} onClose={() => setShowForm(false)} />
         )}
 
-        {/* Botón flotante WhatsApp */}
-        <a className="wa-float" href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer">💬</a>
+        <a className="wa-float" href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" width="35" height="35" />
+        </a>
       </div>
     </>
   );
