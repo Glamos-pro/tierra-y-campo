@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-const WHATSAPP_NUMBER = '529611176006';
+const WHATSAPP_NUMBER = '529616101049';
 const STORAGE_KEY = 'tyc_cliente';
 const DATOS_TRANSFERENCIA = {
   banco: 'BANAMEX',
