@@ -202,6 +202,43 @@ function PopupNegocios({ product, descuento, onAdd, onClose }) {
   );
 }
 
+const FAQS = [
+  { pregunta: '¿Cuál es el horario de entregas?', respuesta: 'Realizamos entregas de lunes a sábado de 10:30am a 5pm en Tuxtla Gutiérrez, Chiapas.' },
+  { pregunta: '¿Cuándo recibiré mi pedido?', respuesta: 'Todos los pedidos realizados antes de las 9pm se entregan al día siguiente hábil.' },
+  { pregunta: '¿Hay mínimo de compra?', respuesta: 'No, no hay mínimo de compra. Puedes pedir desde un solo producto.' },
+  { pregunta: '¿Cuándo es el envío gratis?', respuesta: 'El envío es gratis en compras de $700 o más. Los jueves es gratis a partir de $500.' },
+  { pregunta: '¿Cómo puedo pagar?', respuesta: 'Aceptamos efectivo al momento de la entrega y transferencia bancaria. Te enviamos los datos al confirmar tu pedido.' },
+  { pregunta: '¿A qué zonas entregan?', respuesta: 'Por el momento entregamos en Tuxtla Gutiérrez, Chiapas y zonas cercanas. Contáctanos por WhatsApp si tienes dudas sobre tu colonia.' },
+  { pregunta: '¿Puedo cancelar mi pedido?', respuesta: 'Sí, puedes cancelar hasta 2 horas antes de tu entrega notificándonos por WhatsApp al 961 117 6006.' },
+  { pregunta: '¿Los precios son exactos?', respuesta: 'Los precios mostrados son aproximados. El cobro final se ajusta al peso real del producto al momento de la entrega. Te confirmamos el precio exacto antes de surtir tu pedido.' },
+];
+
+function FaqSection() {
+  const [abierto, setAbierto] = useState(null);
+  return (
+    <div className="tyc-faq">
+      <div className="tyc-faq-inner">
+        <h2 className="tyc-faq-title">Preguntas frecuentes</h2>
+        <p className="tyc-faq-sub">Todo lo que necesitas saber antes de hacer tu primer pedido</p>
+        <div className="tyc-faq-list">
+          {FAQS.map((faq, i) => (
+            <div key={i} className={`tyc-faq-item ${abierto === i ? 'open' : ''}`} onClick={() => setAbierto(abierto === i ? null : i)}>
+              <div className="tyc-faq-pregunta">
+                <span>{faq.pregunta}</span>
+                <span className="tyc-faq-icon">{abierto === i ? '−' : '+'}</span>
+              </div>
+              {abierto === i && <div className="tyc-faq-respuesta">{faq.respuesta}</div>}
+            </div>
+          ))}
+        </div>
+        <div className="tyc-faq-contacto">
+          ¿Tienes otra pregunta? Escríbenos por WhatsApp al <strong>961 117 6006</strong> 💬
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const { cart, addToCart, getTotalItems, getTotalPrice } = useCart();
   const [showForm, setShowForm]             = useState(false);
@@ -350,6 +387,21 @@ export default function Home() {
         .tyc-nosotros-card-icon { font-size: 32px; margin-bottom: 12px; }
         .tyc-nosotros-card-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 300; color: #085041; margin-bottom: 12px; }
         .tyc-nosotros-card-text { font-size: 14px; color: #666; line-height: 1.7; }
+
+        /* ── FAQ ── */
+        .tyc-faq { background: #F7F6F2; padding: 60px 40px; }
+        .tyc-faq-inner { max-width: 780px; margin: 0 auto; }
+        .tyc-faq-title { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 300; color: #085041; text-align: center; margin-bottom: 8px; }
+        .tyc-faq-sub { font-size: 15px; color: #888; text-align: center; margin-bottom: 40px; }
+        .tyc-faq-list { display: flex; flex-direction: column; gap: 12px; }
+        .tyc-faq-item { background: white; border-radius: 14px; border: 1.5px solid rgba(0,0,0,0.07); padding: 20px 24px; cursor: pointer; transition: border-color 0.2s; }
+        .tyc-faq-item:hover { border-color: #1D9E75; }
+        .tyc-faq-item.open { border-color: #085041; }
+        .tyc-faq-pregunta { display: flex; align-items: center; justify-content: space-between; gap: 16px; font-weight: 600; font-size: 15px; color: #1C1C1A; }
+        .tyc-faq-icon { font-size: 22px; color: #085041; flex-shrink: 0; font-weight: 300; }
+        .tyc-faq-respuesta { font-size: 14px; color: #666; line-height: 1.7; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+        .tyc-faq-contacto { margin-top: 32px; text-align: center; font-size: 14px; color: #888; background: white; border-radius: 14px; padding: 20px; border: 1.5px solid rgba(0,0,0,0.07); }
+        .tyc-faq-contacto strong { color: #085041; }
 
         /* ── QR ── */
         .tyc-qr { background: #085041; padding: 60px 40px; }
@@ -658,6 +710,9 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* FAQ */}
+        <FaqSection />
 
         {/* QR */}
         <div className="tyc-qr">
